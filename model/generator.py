@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from fastai.layers import init_linear
 
 from .condition_block import ConditioningBlock
 
@@ -17,6 +18,7 @@ class Generator(nn.Module):
             nn.Linear(self.embed_dim*2, 256),
             nn.SELU()
         )
+        init_linear(self.embed_map[0])
 
         self.init_layer = nn.Sequential(
             nn.Conv2d(in_channels=1, out_channels=128, kernel_size=(5, 15), stride=(1, 1), padding=(2, 7)),
@@ -66,8 +68,8 @@ class Generator(nn.Module):
     # trg: (256,)
     def forward(self, x, src, trg):
         x = x.to(self.device)
-        src = src.unsqueeze(0).to(self.device)
-        trg = trg.unsqueeze(0).to(self.device)
+        src = src.to(self.device)
+        trg = trg.to(self.device)
 
         bs, _, width = x.shape
         src_trg = torch.cat([src, trg], dim=1)

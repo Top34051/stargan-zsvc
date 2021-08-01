@@ -131,4 +131,5 @@ dmypy.json
 # data
 data/
 data
+checkpoints/
 embeddings/

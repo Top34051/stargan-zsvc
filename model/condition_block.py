@@ -1,9 +1,6 @@
-"""
-Note: find out what is init_linear
-"""
-
 import torch
 from torch import nn
+from fastai.layers import init_linear
 
 class CIN(nn.Module):
     
@@ -11,7 +8,9 @@ class CIN(nn.Module):
         super().__init__()
        
         self.gamma = nn.Linear(embed_dim, dim_out)
+        init_linear(self.gamma)
         self.beta = nn.Linear(embed_dim, dim_out)
+        init_linear(self.beta)
     
     def forward(self, x, embed):
         sigma, mu = torch.std_mean(x, dim=2, keepdim=True)

@@ -52,11 +52,9 @@ class Solver():
 
     def train_step(self, idx, x_src, src, trg):
 
-        print('train step:', idx, x_src.shape, src.shape, trg.shape)
-
         x_src = x_src.to(self.device)
-        src = src.to(self.device)
-        trg = trg.to(self.device)
+        src = src.unsqueeze(0).to(self.device)
+        trg = trg.unsqueeze(0).to(self.device)
 
         # inference
         x_src_src = self.gen(x_src, src, src)
@@ -72,26 +70,25 @@ class Solver():
         dis_loss.backward(retain_graph=True)
         self.dis_opt.step()
 
-        print('  dis_loss:', dis_loss.item())
-
         # Train generator
         if idx % 5 == 0:
             
             id_loss = self.l2_loss(x_src, x_src_src)
             cyc_loss = self.l1_loss(x_src, x_src_trg_src)
-            adv_loss = torch.mean((d_src_trg - self.hparam['a']) ** 2)
+
+            d_src_trg_2 = self.dis(x_src_trg, trg, src)
+            adv_loss = torch.mean((d_src_trg_2 - self.hparam['a']) ** 2)
 
             gen_loss = self.hparam['lambda_id'] * id_loss + self.hparam['lambda_cyc'] * cyc_loss + adv_loss
+
            
             self.reset_grad()
             gen_loss.backward(retain_graph=True)
             self.gen_opt.step()
 
-            print('  gen_loss:', gen_loss)
-            print('    id_loss:', id_loss)
-            print('    cyc_loss:', cyc_loss)
-            print('    adv_loss:', adv_loss)
-
+            return dis_loss.item(), gen_loss.item()
+        
+        return dis_loss.item(), None
 
     def train(self, num_epoch=3000):
 
@@ -100,8 +97,27 @@ class Solver():
 
             print('Epoch {}'.format(self.epoch))
 
+            gen_losses = []
+            dis_losses = []
+
             # loop batch
             for idx, (mel, src, trg) in tqdm(enumerate(self.train_loader), total=len(self.train_loader)):
-                self.train_step(idx+1, mel.squeeze(0), src.squeeze(0), trg.squeeze(0))
+                gen_loss, dis_loss = self.train_step(idx+1, mel.squeeze(0), src.squeeze(0), trg.squeeze(0))
+                
+                gen_losses.append(gen_loss)
+                if dis_loss is not None:
+                    dis_losses.append(dis_loss)
+
+            print('  gen loss: {}'.format(sum(gen_losses) / len(gen_losses)))
+            print('  dis loss: {}'.format(sum(dis_losses) / len(dis_losses)))
+            
+            # save checkpoint
+            torch.save({
+                'epoch': self.epoch,
+                'gen': self.gen.state_dict(),
+                'dis': self.dis.state_dict(),
+                'gen_opt': self.gen_opt.state_dict(),
+                'dis_opt': self.dis_opt.state_dict()
+            }, f'./checkpoints/checkpoint_{self.epoch}.pt')
 
             self.epoch += 1

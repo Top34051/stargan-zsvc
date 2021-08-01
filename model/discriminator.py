@@ -1,5 +1,6 @@
 import torch
 from torch import nn
+from fastai.layers import init_linear
 
 
 class Discriminator(nn.Module):
@@ -40,14 +41,17 @@ class Discriminator(nn.Module):
             nn.SELU()
         )
         self.embed = nn.Linear(self.embed_dim*2, 512)
+        init_linear(self.embed_map_src[0])
+        init_linear(self.embed_map_trg[0])
+        init_linear(self.embed)
 
     # x:   (bs, 80, 256)
     # src: (256,)
     # trg: (256,)
     def forward(self, x, src, trg, dropout=False):
         x = x.to(self.device)
-        src = src.unsqueeze(0).to(self.device)
-        trg = trg.unsqueeze(0).to(self.device)
+        src = src.to(self.device)
+        trg = trg.to(self.device)
 
         bs, _, width = x.shape
 
