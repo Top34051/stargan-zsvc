@@ -53,10 +53,10 @@ if __name__ == "__main__":
     test_loader = get_dataloader(training=False, batch_size=16, num_workers=2)
 
     solver = Solver(train_loader, test_loader, {
-        'resume': './checkpoints/checkpoint_6.pt',
+        'resume': './checkpoints/checkpoint_95.pt',
         'optimizers': {
             'gen_lr': 0.0001,
-            'dis_lr': 0.0001,
+            'dis_lr': 0.00005,
             'beta1': 0.9,
             'beta2': 0.999
         },

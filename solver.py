@@ -69,7 +69,7 @@ class Solver():
         self.dis_opt.step()
 
         # Train generator
-        if idx % 5 == 0:
+        if idx % 3 == 0:
             
             id_loss = self.l2_loss(x_src, x_src_src)
             cyc_loss = self.l1_loss(x_src, x_src_trg_src)
@@ -79,14 +79,13 @@ class Solver():
 
             gen_loss = self.hparam['lambda_id'] * id_loss + self.hparam['lambda_cyc'] * cyc_loss + adv_loss
 
-           
             self.reset_grad()
             gen_loss.backward(retain_graph=True)
             self.gen_opt.step()
 
-            return dis_loss.item(), gen_loss.item()
+            return dis_loss.item(), gen_loss.item(), adv_loss.item()
         
-        return dis_loss.item(), None
+        return dis_loss.item(), None, None
 
     def train(self, num_epoch=3000):
 
@@ -97,20 +96,23 @@ class Solver():
 
             gen_losses = []
             dis_losses = []
+            adv_losses = []
 
             # loop batch
             for idx, (mel, src, trg) in tqdm(enumerate(self.train_loader), total=len(self.train_loader)):
-                gen_loss, dis_loss = self.train_step(idx+1, mel.squeeze(0), src.squeeze(0), trg.squeeze(0))
+                dis_loss, gen_loss, adv_loss = self.train_step(idx+1, mel.squeeze(0), src.squeeze(0), trg.squeeze(0))
                 
-                gen_losses.append(gen_loss)
-                if dis_loss is not None:
-                    dis_losses.append(dis_loss)
+                dis_losses.append(dis_loss)
+                if gen_loss is not None:
+                    gen_losses.append(gen_loss)
+                    adv_losses.append(adv_loss)
 
-            print('  gen loss: {}'.format(sum(gen_losses) / len(gen_losses)))
             print('  dis loss: {}'.format(sum(dis_losses) / len(dis_losses)))
+            print('  gen loss: {}'.format(sum(gen_losses) / len(gen_losses)))
+            print('  adv loss: {}'.format(sum(adv_losses) / len(adv_losses)))
             
             # save checkpoint
-            if self.epoch % 10 == 0:
+            if self.epoch % 5 == 0:
                 torch.save({
                     'epoch': self.epoch,
                     'gen': self.gen.state_dict(),
