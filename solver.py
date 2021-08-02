@@ -110,10 +110,11 @@ class Solver():
             print('  dis loss: {}'.format(sum(dis_losses) / len(dis_losses)))
             
             # save checkpoint
-            torch.save({
-                'epoch': self.epoch,
-                'gen': self.gen.state_dict(),
-                'dis': self.dis.state_dict()
-            }, f'./checkpoints/checkpoint_{self.epoch}.pt')
+            if self.epoch % 10 == 0:
+                torch.save({
+                    'epoch': self.epoch,
+                    'gen': self.gen.state_dict(),
+                    'dis': self.dis.state_dict()
+                }, f'./checkpoints/checkpoint_{self.epoch}.pt')
 
             self.epoch += 1

@@ -42,8 +42,7 @@ class VCCDataset(Dataset):
                 i += batch_size
             
             for batch in batches:
-                trgs = random.choices(list(self.embed), k=3)
-                for trg in trgs:
+                for trg in self.embed:
                     if src == trg:
                         continue
                     self.data.append((batch, self.embed[src], self.embed[trg]))
