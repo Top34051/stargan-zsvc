@@ -36,11 +36,9 @@ class Solver():
         # load checkpoint
         if config['resume'] != '':
             checkpoint = torch.load(config['resume'])
-            self.epoch = checkpoint['epoch']
+            self.epoch = checkpoint['epoch'] + 1
             self.gen.load_state_dict(checkpoint['gen'])
             self.dis.load_state_dict(checkpoint['dis'])
-            self.gen_opt.load_state_dict(checkpoint['gen_opt'])
-            self.gen_opt.load_state_dict(checkpoint['dis_opt'])
         
         # losses
         self.l1_loss = nn.L1Loss()
@@ -115,9 +113,7 @@ class Solver():
             torch.save({
                 'epoch': self.epoch,
                 'gen': self.gen.state_dict(),
-                'dis': self.dis.state_dict(),
-                'gen_opt': self.gen_opt.state_dict(),
-                'dis_opt': self.dis_opt.state_dict()
+                'dis': self.dis.state_dict()
             }, f'./checkpoints/checkpoint_{self.epoch}.pt')
 
             self.epoch += 1
