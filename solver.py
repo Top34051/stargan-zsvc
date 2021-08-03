@@ -69,7 +69,7 @@ class Solver():
         self.dis_opt.step()
 
         # Train generator
-        if idx % 3 == 0:
+        if idx % 5 == 0:
             
             id_loss = self.l2_loss(x_src, x_src_src)
             cyc_loss = self.l1_loss(x_src, x_src_trg_src)
