@@ -5,10 +5,13 @@ from fastai.layers import init_linear
 
 class Discriminator(nn.Module):
 
-    def __init__(self, embed_dim):
+    def __init__(self, embed_dim, device=None):
         super().__init__()
         
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if device is None:
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            self.device = device
 
         self.embed_dim = embed_dim
         self.input_dropout = nn.Dropout(p=0.3)

@@ -7,10 +7,13 @@ from .condition_block import ConditioningBlock
 
 class Generator(nn.Module):
 
-    def __init__(self, embed_dim):
+    def __init__(self, embed_dim, device=None):
         super().__init__()
         
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if device is None:
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            self.device = device
 
         # speaker embed
         self.embed_dim = embed_dim

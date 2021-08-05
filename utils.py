@@ -10,8 +10,11 @@ class Audio():
     3. Vocoder              : mel-spectrogram to audio file
     """
 
-    def __init__(self):
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    def __init__(self, device=None):
+        if device is None:
+            self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        else:
+            self.device = device
 
         gru_embedder = torch.hub.load('RF5/simple-speaker-embedding', 'gru_embedder')
         gru_embedder = gru_embedder.to(self.device)

@@ -1,5 +1,5 @@
 {
-    "resume": "./checkpoints/checkpoint_340.pt",
+    "resume": "./checkpoints/checkpoint_610.pt",
     "optimizers": {
         "gen_lr": 0.0001,
         "dis_lr": 0.00005,
