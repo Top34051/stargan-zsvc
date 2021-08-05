@@ -11,5 +11,7 @@
         "b": 0,
         "lambda_id": 5,
         "lambda_cyc": 10
-    }
+    },
+    "epoch_save": 10,
+    "gen_freq": 5
 }

@@ -22,6 +22,9 @@ class Solver():
         self.gen = Generator(embed_dim=256).to(self.device)
         self.dis = Discriminator(embed_dim=256).to(self.device)
 
+        # gen frequency
+        self.gen_freq = config['gen_freq']
+
         # train optimizers
         self.gen_lr = config['optimizers']['gen_lr']
         self.dis_lr = config['optimizers']['dis_lr']
@@ -32,6 +35,9 @@ class Solver():
 
         # hyperparams
         self.hparam = config['hparam']
+
+        # epoch save
+        self.epoch_save = config['epoch_save']
 
         # load checkpoint
         if config['resume'] != '':
@@ -69,7 +75,7 @@ class Solver():
         self.dis_opt.step()
 
         # Train generator
-        if idx % 5 == 0:
+        if idx % self.gen_freq == 0:
             
             id_loss = self.l2_loss(x_src, x_src_src)
             cyc_loss = self.l1_loss(x_src, x_src_trg_src)
@@ -112,7 +118,7 @@ class Solver():
             print('  adv loss: {}'.format(sum(adv_losses) / len(adv_losses)))
             
             # save checkpoint
-            if self.epoch % 5 == 0:
+            if self.epoch % self.epoch_save == 0:
                 torch.save({
                     'epoch': self.epoch,
                     'gen': self.gen.state_dict(),
