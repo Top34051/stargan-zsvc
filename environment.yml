@@ -1,4 +1,4 @@
-name: sing-me
+name: stargan-zsvc
 channels:
   - pytorch
   - defaults
